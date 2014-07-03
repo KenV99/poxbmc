@@ -32,7 +32,7 @@ exclude_directories = ['localized']  # use 'subdir\\subberdir' to designate deep
 output_directory = os.path.join(__cwd__, 'localized')
 current_working_English_strings_po = os.path.join(__cwd__, r'resources\language\English\strings.po')  # set to None
 #  is there isn't one
-option_add_commented_string_when_localizing = False
+option_add_commented_string_when_localizing = True
 
 # tag lines to look for quoted strings with '# @@' (only the part within the quotes)
 # triple quoted multiline strings are NOT supported
