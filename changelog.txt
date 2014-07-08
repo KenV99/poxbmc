@@ -1,0 +1,2 @@
+0.2.0 Added xml digest, check through po file for unused entries, create reports
+0.1.0 Initial release
