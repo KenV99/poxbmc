@@ -342,7 +342,7 @@ def examine_xml(xmlin, xmlout):
             if not skip:
                 tmp = re.search(r'"[^"\\]*(?:\\.[^"\\]*)*"', match).group()
                 msgid = tmp[1:len(tmp)-1]
-                res = podict.has_msgid(match)
+                res = podict.has_msgid(msgid)
                 if res[0]:
                     outnum = res[1]
                     podict.chkdict[res[1]] = True
