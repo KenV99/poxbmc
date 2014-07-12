@@ -334,8 +334,12 @@ def examine_xml(xmlin, xmlout):
                                       % (msgctxt, counter, xmlin.name))
         lbmatchesnl = findnonlocalized_label.search(line)
         if lbmatchesnl:
+            skip = False
             match = lbmatchesnl.group()
-            if match not in lbmatchesl.group():
+            if lbmatchesl is not None:
+                if match in lbmatchesl.group():
+                    skip = True
+            if not skip:
                 tmp = re.search(r'"[^"\\]*(?:\\.[^"\\]*)*"', match).group()
                 msgid = tmp[1:len(tmp)-1]
                 res = podict.has_msgid(match)
@@ -347,7 +351,7 @@ def examine_xml(xmlin, xmlout):
                     podict.addentry(outnum, msgid)
                     podict.chkdict[res[1]] = True
                 repl = 'label="%s"' % outnum
-                newline = re.sub(match, repl, line)
+                newline = re.sub(re.escape(match), repl, line)
                 term += '[%s]' % msgid
         lvmatchesl = findlocalized_lvalues.search(line)
         if lvmatchesl:
@@ -385,7 +389,7 @@ def examine_xml(xmlin, xmlout):
                         podict.addentry(res[1], msgid)
                         podict.chkdict[res[1]] = True
                     repl = res[1]
-                    x = re.sub(msgid, repl, newline)
+                    x = re.sub(re.escape(msgid), repl, newline)
                     newline = x
                     term += '[%s]' % msgid
 
@@ -394,7 +398,7 @@ def examine_xml(xmlin, xmlout):
             matchescom = findcomment.findall(line)
             if len(matchescom) > 0:
                 match = matchescom[len(matchescom)-1]
-                x = re.sub(match, term, newline)
+                x = re.sub(re.escape(match), term, newline)
             else:
                 x = newline[0:len(newline)-1] + term + '\n'
             newline = x
@@ -406,13 +410,6 @@ def main():
     global podict
     podict = PoDict()
     podict.read_from_file(current_working_English_strings_po)
-    if process_xml:
-        xmloutfullfn = os.path.join(__cwd__, 'localized', 'resources', 'settings.xml')
-        xmlin = open(settings_xml, 'r')
-        xmlout = open(xmloutfullfn, 'w')
-        examine_xml(xmlin, xmlout)
-        xmlout.close()
-        xmlin.close()
 
     output_root_dir = os.path.join(root_directory_to_scan, 'localized')
     if not os.path.exists(output_root_dir):
@@ -423,6 +420,15 @@ def main():
     outputfnpofull = os.path.join(output_po_dir, 'strings.po')
     if os.path.exists(outputfnpofull):
         os.remove(outputfnpofull)
+
+    if process_xml:
+        xmloutfullfn = os.path.join(__cwd__, 'localized', 'resources', 'settings.xml')
+        xmlin = open(settings_xml, 'r')
+        xmlout = open(xmloutfullfn, 'w')
+        examine_xml(xmlin, xmlout)
+        xmlout.close()
+        xmlin.close()
+
     files_to_scan = []
     exclusions = []
     for direct in exclude_directories:
